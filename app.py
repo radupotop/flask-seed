@@ -1,6 +1,9 @@
 #!/usr/bin/python2.7
 
-from flask import Flask, request, json, jsonify, Response
+# http://flask.pocoo.org/docs/quickstart/
+# http://flask.pocoo.org/docs/api/
+
+from flask import Flask, request, json, jsonify, Response, abort, redirect, url_for
 from flaskext.sqlalchemy import SQLAlchemy
 
 
@@ -90,11 +93,32 @@ def hello(name):
     
 @app.route('/delete/<name>', methods=['DELETE', 'POST'])
 def delete(name):
+    
+    if request.method == 'POST':
+        resp = {'status': 'Using POST'}
+    else:
+        resp = {'status': 'Using DELETE'}
+    
+    searchword = request.args.get('key', '')
+    
     """Delete user"""
     #~db.session.delete(User).filter_by(username=name)
     #~db.session.commit()
-    return jsonify()
+    return jsonify(resp)
     
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    
+    if request.method == 'POST':
+        f = request.files['file']
+        f.save('/tmp/newfile')
+    
+    return jsonify({'status':'uploaded'})
+    
+@app.route('/redirect', methods=['GET'])
+def redirect_to():
+    redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     app.debug = True
